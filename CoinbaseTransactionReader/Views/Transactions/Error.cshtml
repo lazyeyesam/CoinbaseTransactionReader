@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Error :(";
+}
+
+<div class="card card-body bg-light">
+    <h5 class="card-title">Something went wrong</h5>
+    <div class="mb-1 mt-1">
+        <p class="text-danger">We could not process the file.</p>
+        <p>Make sure it's a .csv file downloaded from Coinbase <a href="https://www.coinbase.com/reports">here</a></p>
+    </div>
+    <div>
+        <a class="btn btn-primary" href="@Url.Action("Index", "Home")">Try again</a>
+    </div>
+</div>

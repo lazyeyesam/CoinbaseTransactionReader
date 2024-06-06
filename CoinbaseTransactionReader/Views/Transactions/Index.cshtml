@@ -1,0 +1,201 @@
+﻿@{
+    ViewData["Title"] = "Transactions";
+}
+
+@using CoinbaseTransactionReader.Model
+@model Portfolio
+
+@functions {
+
+    public static string GetPnLColour(decimal pnl)
+    {
+        var colour = pnl switch
+        {
+            > 0 => "text-success",
+            < 0 => "text-danger",
+            _ => ""
+        };
+        return colour;
+    }
+
+    public static string GetTaxPeriodText(DateTime dateFrom, DateTime dateTo)
+    {
+        if (dateFrom == DateTime.MinValue && dateTo == DateTime.MaxValue)
+            return "All time";
+        if (dateFrom == new DateTime(dateFrom.Year, 1, 1) && dateTo == DateTime.MaxValue)
+            return "Year to date";
+        if (dateTo == DateTime.MaxValue)
+            return "Last 30 days";
+        return $"{dateFrom:yyyy/MM/dd} to {dateTo:yyyy/MM/dd}";
+    }
+}
+
+<div class="row flex-xl-nowrap justify-content-center">
+    <div class="col-12 col-xl-9">
+        <h2>Portfolio for @Model.Name</h2>
+        <div class="card mb-3 mt-3" id="overview">
+            <h4 class="card-header">
+                <a href="https://www.coinbase.com/dashboard" target="_blank">Overview</a>
+            </h4>
+            <div class="card-body">
+                <table class="table table-striped mb-2">
+                    <thead>
+                        <tr>
+                            <th scope="col">Market Value</th>
+                            <th scope="col">Unrealised PnL</th>
+                            <th scope="col">Taxable PnL</th>
+                            <th scope="col">Total Fees</th>
+                            <th scope="col">Realised PnL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="@(GetPnLColour(Model.MarketValue))">@($"{Model.MarketValue:C}")</td>
+                            <td class="@(GetPnLColour(Model.UnrealisedPnL))">@($"{Model.UnrealisedPnL:C}") (@($"{Math.Round(Model.UnrealisedGrowth * 100, 2, MidpointRounding.ToEven)}%"))</td>
+                            <td class="@(GetPnLColour(Model.TaxablePnL))">@($"{Model.TaxablePnL:C}")</td>
+                            <td class="text-danger">@($"{Model.TotalFees:C}")</td>
+                            <td class="@(GetPnLColour(Model.RealisedPnL - Model.TotalFees))">@($"{Model.RealisedPnL - Model.TotalFees:C}")</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="card-text text-right">
+                    <small class="text-muted">Tax calculation period: @GetTaxPeriodText(Model.DateFrom, Model.DateTo)</small>
+                </p>
+            </div>
+        </div>
+
+        @foreach (var orderBook in Model.OrderBooks)
+        {
+            @if (Model.OrderBooks.IndexOf(orderBook) % 3 == 0)      // only display an ad every three assets
+            {
+                <div>
+                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6905224824222047"
+                    crossorigin="anonymous"></script>
+                    <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-format="fluid"
+                 data-ad-layout-key="-f9+5v+4m-d8+7b"
+                 data-ad-client="ca-pub-6905224824222047"
+                 data-ad-slot="3154758671"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+            }
+
+            <div class="card mb-3" id="@orderBook.Asset">
+                <h4 class="card-header">
+                    <a href="https://www.coinbase.com/price/@(orderBook.Asset.ToLower())" target="_blank"><img src="@($"/img/crypto_icons/{orderBook.Asset}.svg".ToLower())" width="32" onerror="this.onerror=null;this.src='/img/crypto_icons/missing.png';" /> @orderBook.Asset</a>
+                </h4>
+                <div class="card-body">
+                    <table class="table table-striped mb-2">
+                        <thead>
+                            <tr>
+                                <th scope="col">Qty</th>
+                                <th scope="col">Average Price</th>
+                                <th scope="col">Bought</th>
+                                <th scope="col">Sold</th>
+                                <th scope="col">Market Value</th>
+                                <th scope="col">Unrealised PnL</th>
+                                <th scope="col">Taxable PnL</th>
+                                <th scope="col">Total Fees</th>
+                                <th scope="col">Realised PnL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@orderBook.Position</td>
+                                <td>@($"{orderBook.AveragePrice:C}")</td>
+                                <td>@orderBook.TotalBought</td>
+                                <td>@orderBook.TotalSold</td>
+                                <td class="@(GetPnLColour(orderBook.MarketValue))">@($"{orderBook.MarketValue:C}")</td>
+                                <td class="@(GetPnLColour(orderBook.UnrealisedPnL))">@($"{orderBook.UnrealisedPnL:C}")@(orderBook.Position != 0 ? $" ({Math.Round(orderBook.UnrealisedGrowth * 100, 2, MidpointRounding.AwayFromZero)}%)" : "")</td>
+                                <td class="@(GetPnLColour(orderBook.TaxablePnL))">@($"{orderBook.TaxablePnL:C}")</td>
+                                <td class="text-danger">@($"{orderBook.TotalFees:C}")</td>
+                                <td class="@(GetPnLColour(orderBook.RealisedPnL - orderBook.TotalFees))">@($"{orderBook.RealisedPnL - orderBook.TotalFees:C}")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-striped transactions">
+                        <thead>
+                            <tr>
+                                <th scope="col">Timestamp</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">SubTotal</th>
+                                <th scope="col">Fees</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in orderBook.Orders)
+                            {
+                                <tr>
+                                    <td>@($"{order.Timestamp:yyyy/MM/dd HH:mm:ss}")</td>
+                                    <td class="@(order.OrderType == OrderType.Buy ? "text-primary" : "text-danger")">@order.OrderType</td>
+                                    <td>@order.Quantity</td>
+                                    <td>@($"{order.Price:C}")</td>
+                                    <td>@($"{order.SubTotal:C}")</td>
+                                    <td>@($"{order.Fees:C}")</td>
+                                    <td>@($"{(order.SubTotal - order.Fees):C}")</td>
+                                    <td>@order.Notes</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <p class="card-text text-right">
+                        <small class="text-muted">@($"{orderBook.Asset}: {Math.Round(orderBook.CurrentPrice.Rate, 4, MidpointRounding.AwayFromZero)} {Model.Currency}")</small>
+                        <small class="text-muted">(<time class="timeago" datetime="@($"{orderBook.CurrentPrice.TimeStamp:o}")">@orderBook.CurrentPrice.TimeStamp</time>)</small>
+                    </p>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="d-none d-xl-block col-xl-1 bd-toc">
+        <ul class="section-nav">
+            <li class="toc-entry">
+                <a href="#overview">Overview</a>
+            </li>
+            @foreach (var orderBook in @Model.OrderBooks)
+            {
+                <li class="toc-entry">
+                    <a href="#@orderBook.Asset">@orderBook.Asset</a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+
+@section Styles
+{
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" type="text/css" href="~/css/transactions.css" />
+}
+
+@section Scripts
+{
+<script src="~/lib/jquery-timeago/jquery.timeago.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
+
+<script language="javascript">
+    $(document).ready(function () {
+        $("time.timeago").timeago();
+
+        $('table.transactions').dataTable({
+            "order": [[0, 'desc']],
+            "language": {
+                "emptyTable": "No transactions found",
+                "lengthMenu": "Show _MENU_ transactions",
+                "info": "Showing _START_ to _END_ of _TOTAL_ transactions"
+            }
+        });
+    });
+</script>
+}

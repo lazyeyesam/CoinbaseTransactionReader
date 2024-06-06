@@ -1,0 +1,41 @@
+﻿.bd-toc {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 1rem;
+    height: calc(100vh - 1rem);
+    overflow-y: auto;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    font-size: .875rem;
+}
+
+.section-nav {
+    padding-left: 0;
+    border-left: 1px solid #eee;
+}
+
+.toc-entry {
+    display: block;
+}
+
+.toc-entry a {
+    display: block;
+    padding: .125rem 1.5rem;
+    color: #99979c;
+}
+
+.anchorjs-link {
+    font-weight: 400;
+    color: rgba(0,123,255,.5);
+    transition: color .16s linear;
+    opacity: 0;
+    text-decoration: none;
+    -webkit-font-smoothing: antialiased;
+    background-color: transparent;
+}
+
+@media (max-width: 864px) {
+    body {
+        min-width: 864px;
+    }
+}

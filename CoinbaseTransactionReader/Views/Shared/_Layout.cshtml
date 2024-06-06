@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Coinbase Transactions Reader</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="icon" href="~/img/favicon/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" href="~/img/favicon/android-chrome-512x512.png" sizes="512x512">
+    <link rel="icon" href="~/img/favicon/favicon.ico" sizes="48x48">
+    <link rel="icon" href="~/img/favicon/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" href="~/img/favicon/favicon-32x32.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/img/favicon/apple-touch-icon.png" sizes="180x180">
+    @RenderSection("Styles", required: false)
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M7FF6G9TLP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-M7FF6G9TLP');
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6905224824222047" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <div class="container-fluid pl-0 pr-0">
+            <nav class="navbar navbar-expand-sm navbar-toggleable -sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <div class="container-fluid">
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                        <img height="30" src="~/img/logo.png" alt="Coinbase" />
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer>
+        <div class="container-fluid footer pl-0 pr-0">
+            <div class="border-top text-muted pl-3 pr-3">2021 - <a class="text-muted" href="https://lazyeyeapps.com">lazyeyeapps</a> - <a href="https://www.buymeacoffee.com/lazyeyesam"><img src="img/coffee.png" alt="Buy me a coffee" /></a></div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
