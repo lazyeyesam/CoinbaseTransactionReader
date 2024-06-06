@@ -23,7 +23,7 @@ namespace CoinbaseTransactionReader.Infrastructure
         {
             _context = context;
             _logger = logger;
-            _api = new CoinApiRestClient("1E1FEB60-D1D3-4106-BCDD-22C5014C5F22");
+            _api = new CoinApiRestClient("xxx");
         }
 
         /// <summary>
