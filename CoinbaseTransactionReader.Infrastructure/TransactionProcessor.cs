@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CoinbaseTransactionReader.Infrastructure.Interfaces;
 using CoinbaseTransactionReader.Infrastructure.Parsers;
 using CoinbaseTransactionReader.Model;
@@ -41,10 +42,10 @@ namespace CoinbaseTransactionReader.Infrastructure
             fileContents.RemoveRange(0, 8);
 
             // process the transactions
-            fileContents.ForEach(entry =>
+            fileContents.ForEach(async entry =>
             {
                 var asset = entry[2];
-                var orderBook = GetOrderBook(asset, portfolio);
+                var orderBook = await GetOrderBook(asset, portfolio);
 
                 // parse the transactions and add to the order book
                 Order order;
@@ -65,7 +66,7 @@ namespace CoinbaseTransactionReader.Infrastructure
                         break;
                     case CoinbaseType.Convert:
                         var buyOrder = _convertToBuyParser.Parse(entry);
-                        var buyOrderBook = GetOrderBook(buyOrder.Asset, portfolio);
+                        var buyOrderBook = await GetOrderBook(buyOrder.Asset, portfolio);
                         buyOrderBook.Orders.Add(buyOrder);
 
                         var sellOrder = _convertToSellParser.Parse(entry);
@@ -82,12 +83,12 @@ namespace CoinbaseTransactionReader.Infrastructure
             return portfolio;
         }
 
-        private OrderBook GetOrderBook(string asset, Portfolio portfolio)
+        private async Task<OrderBook> GetOrderBook(string asset, Portfolio portfolio)
         {
             var orderBook = portfolio.OrderBooks.SingleOrDefault(books => books.Asset == asset);
             if (orderBook != null) return orderBook;
 
-            var price = _pricesConnection.GetPrice(asset, portfolio.Currency);
+            var price = await _pricesConnection.GetPrice(asset, portfolio.Currency);
 
             orderBook = new OrderBook { Asset = asset, CurrentPrice = price};
             portfolio.OrderBooks.Add(orderBook);

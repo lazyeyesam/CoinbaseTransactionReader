@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using CoinAPI.REST.V1;
 using CoinbaseTransactionReader.Connection;
 using CoinbaseTransactionReader.Infrastructure.Interfaces;
@@ -32,7 +33,7 @@ namespace CoinbaseTransactionReader.Infrastructure
         /// <param name="asset">The asset.</param>
         /// <param name="currency">The currency.</param>
         /// <returns></returns>
-        public Price GetPrice(string asset, string currency)
+        public async Task<Price> GetPrice(string asset, string currency)
         {
             // try get the price from the database and return if it's less than an hour old
             var price = _context.Prices.SingleOrDefault(px => asset == px.BaseCurrency && currency == px.TargetCurrency);
@@ -45,7 +46,7 @@ namespace CoinbaseTransactionReader.Infrastructure
             try
             {
                 // get the price from the API
-                var coinApiPrice = _api.Exchange_rates_get_specific_rateAsync(asset, currency).GetAwaiter().GetResult();
+                var coinApiPrice = await _api.Exchange_rates_get_specific_rateAsync(asset, currency);
                 price.BaseCurrency = asset;
                 price.TimeStamp = coinApiPrice.time;
                 price.TargetCurrency = currency;

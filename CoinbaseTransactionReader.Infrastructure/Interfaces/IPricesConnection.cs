@@ -11,6 +11,6 @@ namespace CoinbaseTransactionReader.Infrastructure.Interfaces
 {
     public interface IPricesConnection
     {
-        Price GetPrice(string asset, string currency);
+        Task<Price> GetPrice(string asset, string currency);
     }
 }
